@@ -1,3 +1,7 @@
+# ⚠️ WARNING: Comoxy is no longer being maintained.
+
+This is **Offical** Comoxy has been taken down forever
+
 # OG comoxy!
 
 Welcome to the OG comoxy! project. Click on the release below to download the latest version.
