@@ -1,6 +1,6 @@
-# ⚠️ WARNING: Comoxy is no longer being maintained.
+# Comoxy is now back!
 
-This is **Offical** Comoxy has been taken down forever
+This is **offical!** Comoxy is back.
 
 # OG comoxy!
 
