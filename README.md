@@ -20,7 +20,7 @@ To start your journey, grab the latest release below:
 🔗 **Direct Download:** [Comoxy Backend v1.0.2](https://github.com/comoxyOG/comoxyog/releases/download/ComoxyBackendv1.0.2/Comoxy.Backend.Singleplayer.7z)
 
 ### Important Note:
-To fully utilize Comoxy, make sure to visit the **Releases** section to access relevant instructions and setup guides.
+To fully utilize Comoxy, make sure to visit the [Releases](https://github.com/comoxyOG/comoxyog/releases/) section to access relevant instructions and setup guides.
 
 ## Upcoming Features!
 🚀 A **Comoxy Launcher** is in development! This will streamline the setup process, making it easier than ever to access past Fortnite versions effortlessly.
