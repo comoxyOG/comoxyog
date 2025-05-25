@@ -28,5 +28,5 @@ To fully utilize Comoxy, make sure to visit the [Releases](https://github.com/co
 ## Join the Community!
 Engage with fellow Comoxy users, share insights, troubleshoot issues, and stay updated with the latest developments through our official Discord server:
 
-🔗 **Discord Server:** [Join Here](https://discord.gg/2pCD6z5j3f)
+🔗 **Discord Server:** [Discord](https://discord.gg/2pCD6z5j3f)
 
