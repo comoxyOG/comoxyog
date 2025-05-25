@@ -30,3 +30,5 @@ Engage with fellow Comoxy users, share insights, troubleshoot issues, and stay u
 
 🔗 **Discord Server:** [Discord](https://discord.gg/2pCD6z5j3f)
 
+**Enjoy old Fortnite, with Comoxy!**
+
