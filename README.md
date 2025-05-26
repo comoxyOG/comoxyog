@@ -1,7 +1,7 @@
 # RELOAD BACKEND REMAKE 
 
 **This backend is owned by Burlone, but was edited by me, burlone if your reading this, im sorry for not giving credite beforehand.**
-
+anything i say is owned by me ie owned by Burlone
 
 
 # Comoxy Is Officially Back!
