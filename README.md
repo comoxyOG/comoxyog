@@ -1,3 +1,9 @@
+# RELOAD BACKEND REMAKE 
+
+**This backend is owned by Burlone, but was edited by me, burlone if your reading this, im sorry for not giving credite beforehand.**
+
+
+
 # Comoxy Is Officially Back!
 
 The legendary **OG Comoxy** project has returned, bringing back an authentic and nostalgic experience for all Fortnite enthusiasts. Whether you're here for the classic events or diving into the backend magic, this is your opportunity to revisit the golden days of Fortnite.
