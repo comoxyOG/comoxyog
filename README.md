@@ -20,7 +20,8 @@ Comoxy itself is not a “Fortnite builds archive.” It’s the launcher, comma
 
 ## Quick start
 - **Run the launcher** and select your setup option.
-- **Use the documented commands** (e.g., `open 127.0.0.1`) to initialize a local session as shown in Comoxy’s tutorial videos.
+- (run the game server) and run new fortnite.
+- **Use the documented commands** (`open 127.0.0.1`) to initialize a local session as shown in Comoxy’s tutorial videos.
 - **Adjust configs** using the commands/cheats repo for fine-tuning behavior.
 
 ## Project structure
