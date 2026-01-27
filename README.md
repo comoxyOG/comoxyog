@@ -37,3 +37,167 @@ Comoxy is a fan-made, community-maintained project and is not affiliated with, e
 
 ---
 > Sources: 
+
+
+# 🔧 CRITICAL FIXES NEEDED FOR YOUR INDEX.JS
+
+## ❌ PROBLEM #1: SKINS DON'T LOAD
+**Location:** Lines 5-17 and 76-89
+
+### The Issue:
+Your `athenaProfile` is loaded from disk (line 76-89) but **NEVER** merged into the profiles system. The `initProfile` function (lines 5-17) creates empty profiles with `items: {}`, so skins from athena.json are never used.
+
+### The Fix:
+**Add these lines after line 89:**
+
+```javascript
+// ✅ FIX: Store athenaProfile as template for new profiles
+if (athenaProfile && Object.keys(athenaProfile).length > 0) {
+  profiles._template = { athena: athenaProfile };
+  console.log("✅ Athena profile stored as template");
+}
+```
+
+**Then modify `initProfile` function (lines 5-17) to:**
+
+```javascript
+function initProfile(accountId) {
+  if (!profiles[accountId]) {
+    // ✅ FIX: Use loaded athena profile as template
+    const athenaTemplate = profiles._template?.athena || {
+      revision: 0,
+      created: new Date().toISOString(),
+      wipeNumber: 1,
+      items: {},
+      stats: { attributes: {} }
+    };
+    
+    profiles[accountId] = {
+      athena: JSON.parse(JSON.stringify(athenaTemplate)) // Deep clone
+    };
+  }
+  return profiles[accountId];
+}
+```
+
+---
+
+## ❌ PROBLEM #2: NEWS DOESN'T WORK
+**Location:** Line 23
+
+### The Issue:
+You import `contentPagesRouter` on line 23:
+```javascript
+import contentPagesRouter from "./routes/contentPagesRouter.js";
+```
+
+But you **NEVER MOUNT IT** to the Express app! It's imported but never used.
+
+### The Fix:
+**Find line 98** which says:
+```javascript
+app.use("/", mainRoutes);
+```
+
+**Add this line RIGHT AFTER IT:**
+```javascript
+app.use("/", mainRoutes);
+app.use("/", contentPagesRouter);  // ✅ FIX: Mount the news router!
+```
+
+---
+
+## ❌ PROBLEM #3: LOBBY BACKGROUNDS DON'T WORK
+**Location:** Line 390 (inside the `/content/api/pages/fortnite-game` endpoint)
+
+### The Issue:
+Your `dynamicbackgrounds` section exists (lines 390-407) but it's being **BLOCKED** by the regex route on line 812:
+
+```javascript
+app.get(/^\/content\/api\/pages\/fortnite-game(\/.*)?$/, (_, r) => no(r));
+```
+
+This returns a 204 (No Content) response which overwrites your actual content pages endpoint!
+
+### The Fix:
+**REMOVE OR COMMENT OUT line 812:**
+
+```javascript
+// ❌ REMOVE THIS LINE - it blocks your news and backgrounds:
+// app.get(/^\/content\/api\/pages\/fortnite-game(\/.*)?$/, (_, r) => no(r));
+```
+
+The proper endpoint at line 330-430 will then work correctly.
+
+---
+
+## 📋 SUMMARY OF ALL CHANGES
+
+### Change #1: After line 89, ADD:
+```javascript
+// ✅ Merge athenaProfile into profiles template
+if (athenaProfile && Object.keys(athenaProfile).length > 0) {
+  profiles._template = { athena: athenaProfile };
+  console.log("✅ Athena profile stored as template");
+}
+```
+
+### Change #2: Replace lines 5-17 with:
+```javascript
+function initProfile(accountId) {
+  if (!profiles[accountId]) {
+    const athenaTemplate = profiles._template?.athena || {
+      revision: 0,
+      created: new Date().toISOString(),
+      wipeNumber: 1,
+      items: {},
+      stats: { attributes: {} }
+    };
+    
+    profiles[accountId] = {
+      athena: JSON.parse(JSON.stringify(athenaTemplate))
+    };
+  }
+  return profiles[accountId];
+}
+```
+
+### Change #3: After line 98, ADD:
+```javascript
+app.use("/", contentPagesRouter);
+```
+
+### Change #4: DELETE line 812:
+```javascript
+// DELETE THIS LINE:
+app.get(/^\/content\/api\/pages\/fortnite-game(\/.*)?$/, (_, r) => no(r));
+```
+
+---
+
+## ✅ WHAT THESE FIXES DO
+
+1. **Skins Fix:** Loads all skins from athena.json into new player profiles
+2. **News Fix:** Actually mounts the contentPagesRouter so news displays  
+3. **Backgrounds Fix:** Removes the blocking route that was preventing backgrounds from loading
+
+---
+
+## 🚀 TESTING AFTER FIXES
+
+1. Restart your server
+2. Check console for: `"✅ Athena profile stored as template"`
+3. Login to game - skins should now appear in locker
+4. Check lobby - news should display
+5. Check lobby background - should no longer be default/black
+
+---
+
+## 📝 LINE NUMBERS REFERENCE
+
+- **Lines 5-17:** `initProfile` function
+- **Line 23:** `contentPagesRouter` import
+- **Lines 76-89:** Athena profile loading
+- **Line 98:** `mainRoutes` mounting
+- **Lines 330-430:** Content pages endpoint (the GOOD one)
+- **Line 812:** Blocking regex route (the BAD one)
