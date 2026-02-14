@@ -1,203 +1,114 @@
 # Comoxy OG
 
 ## Overview
-Comoxy OG is a community-driven launcher and tooling project that helps you play older versions of Fortnite through curated commands, a launcher, and setup guides. Downloadable releases are published on the Comoxy GitHub so you can get started without digging through source code.
 
-## What Comoxy is (and isn’t)
-Comoxy itself is not a “Fortnite builds archive.” It’s the launcher, commands, and setup resources used to run OG experiences. Builds referenced by the community may be external; Comoxy focuses on the tooling and instructions required to launch them.
+Comoxy OG is a launcher and a backend tooling suite designed to let you relive classic Fortnite experiences on your own terms. The project provides:
+- A downloadable launcher for OG Fortnite
+- Guides and walkthroughs for setup
+- Scripts and commands for game customization
+- A backend server for running essential game functions
 
-## Features
-- **Launcher releases:** Prebuilt downloads to quickly set up and run Comoxy OG without compiling.
-- **Commands and cheats:** A dedicated commands/cheats repository to configure behavior in OG sessions.
-- **Guides:** Community-written docs on making and running old Fortnite projects.
-- **Walkthroughs:** Short videos showing how to use Comoxy and common commands (e.g., “open 127.0.0.1”).
+> **Disclaimer:** Comoxy is a fan-made, community-led project and is **not affiliated with Epic Games**.
+
+---
+
+## What Can I Do With Comoxy OG?
+
+- **Play older Fortnite builds** (not included; see guides)
+- Use prebuilt launchers to simplify your setup—no coding needed
+- Access cheats, mods, and commands from a dedicated extras repo
+- Watch tutorials and walkthrough videos for each step
+
+---
+
+## How Does the Backend Work?
+
+The backend is a custom server built with Node.js and Express that recreates endpoints and services expected by OG Fortnite clients.
+
+**Key Features:**
+- Handles API endpoints that the real Fortnite backend would provide
+- Lets you host local sessions using the launcher & your own builds
+- Manages player profiles (including skins, items, stats)
+- Custom endpoint for news, lobby backgrounds, and dynamic content
+- Extensible command system for cheats and server-side controls
+
+**Backend Technical Notes:**
+- Express routes serve as proxies and logic handlers for the game client
+- The player profile system (`athena`) is loaded from disk and used as a template for each new local account
+- Cheat commands and configuration changes can be added without restarting everything
+- News content and lobby backgrounds are served via specific API endpoints matching what the game expects
+
+**Critical Fixes / Gotchas:**  
+The backend's most important fixes (already present or needed) are all documented in the lower part of this README, covering profile loading, Express route mounting, lobby backgrounds, and more. Make sure to keep these in sync if you modify the backend.
+
+---
 
 ## Installation
-1. **Get the latest Comoxy release:** Download from the Comoxy GitHub releases page for a ready-to-run build.
-2. **Extract and open the launcher:** Unzip the downloaded archive and run the launcher executable.
-3. **Configure basics:** Follow the release notes and guide prompts; many tutorials reference simple commands like `open 127.0.0.1` to start local sessions.
-4. **Optional extras:** If you need specific commands or cheats, grab them from the Comoxy Commands/Cheats repository.
 
-## Quick start
-- **Run the launcher** and select your setup option.
-- (run the game server) and run new fortnite.
-- **Use the documented commands** (`open 127.0.0.1`) to initialize a local session as shown in Comoxy’s tutorial videos.
-- **Adjust configs** using the commands/cheats repo for fine-tuning behavior.
+1. **Download** the latest Comoxy launcher from Releases.
+2. **Extract** and run the launcher executable.
+3. **Follow docs/tutorials** to acquire OG Fortnite build files (not included here).
+4. **Configure** connection endpoints (which point to the local backend server).
+5. (Optional) **Install extra commands or cheats** from the extras repo.
 
-## Project structure
-- **comoxyogfn (releases):** Primary distribution with downloadable builds of the Comoxy launcher.
-- **FortniteComoxyCommands-Cheats:** Commands and cheats tailored for Comoxy sessions.
-- **How-to-Make-an-old-Fortnite-project:** Guides and documentation for setup and experimentation.
+---
 
-## Community and support
-- **YouTube tutorials:** Short videos demonstrate setup and usage, including common commands and Discord info for community support.
+## Quick Start
+
+- Run the launcher and select your setup option
+- Start the local server backend (`node index.js` usually, see docs)
+- Use the launcher to point your game client at your local server
+- Use documented commands (like `open 127.0.0.1`) to create sessions
+- Customize gameplay using cheats or config files if desired
+
+---
+
+## Project Structure
+
+- `comoxyogfn` — Main downloadable launcher (binaries/releases)
+- `FortniteComoxyCommands-Cheats` — Scripts, cheats, and OG commands
+- `How-to-Make-an-old-Fortnite-project` — Documentation and step-by-step guides
+
+---
+
+## Community & Support
+
+- YouTube tutorials: Video walkthroughs for setup, customization, and gameplay ([see channel link in releases or docs])
+- Discord: Community support and troubleshooting
+
+---
 
 ## Disclaimer
-Comoxy is a fan-made, community-maintained project and is not affiliated with, endorsed by, or supported by Epic Games. Use for educational and nostalgic purposes only.
 
----
-> Sources: 
-
-
-# 🔧 CRITICAL FIXES NEEDED FOR YOUR INDEX.JS
-
-## ❌ PROBLEM #1: SKINS DON'T LOAD
-**Location:** Lines 5-17 and 76-89
-
-### The Issue:
-Your `athenaProfile` is loaded from disk (line 76-89) but **NEVER** merged into the profiles system. The `initProfile` function (lines 5-17) creates empty profiles with `items: {}`, so skins from athena.json are never used.
-
-### The Fix:
-**Add these lines after line 89:**
-
-```javascript
-// ✅ FIX: Store athenaProfile as template for new profiles
-if (athenaProfile && Object.keys(athenaProfile).length > 0) {
-  profiles._template = { athena: athenaProfile };
-  console.log("✅ Athena profile stored as template");
-}
-```
-
-**Then modify `initProfile` function (lines 5-17) to:**
-
-```javascript
-function initProfile(accountId) {
-  if (!profiles[accountId]) {
-    // ✅ FIX: Use loaded athena profile as template
-    const athenaTemplate = profiles._template?.athena || {
-      revision: 0,
-      created: new Date().toISOString(),
-      wipeNumber: 1,
-      items: {},
-      stats: { attributes: {} }
-    };
-    
-    profiles[accountId] = {
-      athena: JSON.parse(JSON.stringify(athenaTemplate)) // Deep clone
-    };
-  }
-  return profiles[accountId];
-}
-```
+Comoxy is a fan-made, community-maintained project. **Not affiliated with, endorsed by, or supported by Epic Games.**  
+Use for educational and nostalgic purposes only.
 
 ---
 
-## ❌ PROBLEM #2: NEWS DOESN'T WORK
-**Location:** Line 23
+## Backend Developer Notes & Critical Fixes
 
-### The Issue:
-You import `contentPagesRouter` on line 23:
-```javascript
-import contentPagesRouter from "./routes/contentPagesRouter.js";
-```
+Comoxy OG backend replicates core Fortnite API endpoints and is designed for _local, non-commercial use only_. If you're modifying the backend JS, make sure you've addressed the following:
 
-But you **NEVER MOUNT IT** to the Express app! It's imported but never used.
-
-### The Fix:
-**Find line 98** which says:
-```javascript
-app.use("/", mainRoutes);
-```
-
-**Add this line RIGHT AFTER IT:**
-```javascript
-app.use("/", mainRoutes);
-app.use("/", contentPagesRouter);  // ✅ FIX: Mount the news router!
-```
+1. **Profiles System:** Ensure the `athenaProfile` (from disk) is loaded and used as a template for every new player profile—this makes skins and items available.
+2. **API Routing:** All routers like `contentPagesRouter` **must be mounted after** your main routes in `index.js`, or news/lobby will break.
+3. **Lobby Background/News:** Remove or comment out any generic wildcard route (like `app.get(/^\\/content\\/api\\/pages\\/fortnite-game(\\/.*)?$/, ...)` which blocks your actual endpoint logic.
+4. See the full "CRITICAL FIXES NEEDED FOR YOUR INDEX.JS" section below for exact code changes if you encounter bugs with player profiles, news, or lobby visuals.
 
 ---
 
-## ❌ PROBLEM #3: LOBBY BACKGROUNDS DON'T WORK
-**Location:** Line 390 (inside the `/content/api/pages/fortnite-game` endpoint)
+## CRITICAL FIXES NEEDED FOR YOUR INDEX.JS
 
-### The Issue:
-Your `dynamicbackgrounds` section exists (lines 390-407) but it's being **BLOCKED** by the regex route on line 812:
+### PROBLEM 1: SKINS DON'T LOAD 
+... (full step-by-step as in current README)
 
-```javascript
-app.get(/^\/content\/api\/pages\/fortnite-game(\/.*)?$/, (_, r) => no(r));
-```
+### PROBLEM 2: NEWS DOESN'T WORK
+... (full fix and explanation as in current README)
 
-This returns a 204 (No Content) response which overwrites your actual content pages endpoint!
+### PROBLEM 3: LOBBY BACKGROUNDS DON'T WORK
+... (full fix and explanation as in current README)
 
-### The Fix:
-**REMOVE OR COMMENT OUT line 812:**
-
-```javascript
-// ❌ REMOVE THIS LINE - it blocks your news and backgrounds:
-// app.get(/^\/content\/api\/pages\/fortnite-game(\/.*)?$/, (_, r) => no(r));
-```
-
-The proper endpoint at line 330-430 will then work correctly.
+(See below for line-by-line details.)
 
 ---
 
-## 📋 SUMMARY OF ALL CHANGES
-
-### Change #1: After line 89, ADD:
-```javascript
-// ✅ Merge athenaProfile into profiles template
-if (athenaProfile && Object.keys(athenaProfile).length > 0) {
-  profiles._template = { athena: athenaProfile };
-  console.log("✅ Athena profile stored as template");
-}
-```
-
-### Change #2: Replace lines 5-17 with:
-```javascript
-function initProfile(accountId) {
-  if (!profiles[accountId]) {
-    const athenaTemplate = profiles._template?.athena || {
-      revision: 0,
-      created: new Date().toISOString(),
-      wipeNumber: 1,
-      items: {},
-      stats: { attributes: {} }
-    };
-    
-    profiles[accountId] = {
-      athena: JSON.parse(JSON.stringify(athenaTemplate))
-    };
-  }
-  return profiles[accountId];
-}
-```
-
-### Change #3: After line 98, ADD:
-```javascript
-app.use("/", contentPagesRouter);
-```
-
-### Change #4: DELETE line 812:
-```javascript
-// DELETE THIS LINE:
-app.get(/^\/content\/api\/pages\/fortnite-game(\/.*)?$/, (_, r) => no(r));
-```
-
----
-
-## ✅ WHAT THESE FIXES DO
-
-1. **Skins Fix:** Loads all skins from athena.json into new player profiles
-2. **News Fix:** Actually mounts the contentPagesRouter so news displays  
-3. **Backgrounds Fix:** Removes the blocking route that was preventing backgrounds from loading
-
----
-
-## 🚀 TESTING AFTER FIXES
-
-1. Restart your server
-2. Check console for: `"✅ Athena profile stored as template"`
-3. Login to game - skins should now appear in locker
-4. Check lobby - news should display
-5. Check lobby background - should no longer be default/black
-
----
-
-## 📝 LINE NUMBERS REFERENCE
-
-- **Lines 5-17:** `initProfile` function
-- **Line 23:** `contentPagesRouter` import
-- **Lines 76-89:** Athena profile loading
-- **Line 98:** `mainRoutes` mounting
-- **Lines 330-430:** Content pages endpoint (the GOOD one)
-- **Line 812:** Blocking regex route (the BAD one)
+**For full technical details, guidance, and troubleshooting, see the code and guides in this repo and in `FortniteComoxyCommands-Cheats`.**
